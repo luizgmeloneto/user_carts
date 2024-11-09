@@ -104,15 +104,35 @@ def get_user_carts():
                 how='left'
             )
             
-            # Agrupando por usuário para obter as informações solicitadas
-            user_summary = (
+            # Primeiro, vamos calcular a quantidade total de produtos por categoria para cada usuário
+            category_counts = (
                 df_final
-                .groupby('user_id')
-                .agg({
-                    'date': 'max',  # Data mais recente
-                    'category': lambda x: x.value_counts().index[0]  # Categoria mais frequente
-                })
+                .groupby(['user_id', 'category'])['quantity']
+                .sum()
                 .reset_index()
+            )
+            
+            # Encontrar a categoria mais frequente baseada na quantidade total
+            most_frequent_categories = (
+                category_counts
+                .sort_values('quantity', ascending=False)
+                .groupby('user_id')
+                .first()
+                .reset_index()[['user_id', 'category']]
+            )
+            
+            # Agora pegamos apenas a data mais recente
+            latest_dates = (
+                df_final
+                .groupby('user_id')['date']
+                .max()
+                .reset_index()
+            )
+            
+            # Juntando as informações
+            user_summary = (
+                most_frequent_categories
+                .merge(latest_dates, on='user_id')
                 .rename(columns={
                     'date': 'latest_date',
                     'category': 'most_frequent_category'
