@@ -49,26 +49,20 @@ def upload_df_to_gcs(df, bucket_name='enjoei-bucket', folder_name='user_carts'):
         return False
 
 def get_categories():
-    # Fazendo a chamada à API de categorias
-    url = 'https://fakestoreapi.com/products/categories'
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        categories = response.json()
-        # Como a API só retorna as categorias, vamos buscar todos os produtos para ter o mapeamento
-        products_response = requests.get('https://fakestoreapi.com/products')
-        if products_response.status_code == 200:
-            products = products_response.json()
-            # Criando DataFrame com produto e categoria
-            categories_df = pd.DataFrame([
-                {
-                    'product_id': product['id'],
-                    'category': product['category']
-                }
-                for product in products
-            ])
-            return categories_df
-    return None
+
+    # Vamos buscar todos os produtos para ter o mapeamento
+    products_response = requests.get('https://fakestoreapi.com/products')
+    if products_response.status_code == 200:
+        products = products_response.json()
+        # Criando DataFrame com produto e categoria
+        categories_df = pd.DataFrame([
+            {
+                'product_id': product['id'],
+                'category': product['category']
+            }
+            for product in products
+        ])
+        return categories_df
 
 def get_user_carts():
     # Fazendo a chamada à API
@@ -151,4 +145,4 @@ if __name__ == "__main__":
     print(df)
     if df is not None:
         df.to_csv('users_data.csv', index=False)
-        # upload_df_to_gcs(df)
+        upload_df_to_gcs(df)
