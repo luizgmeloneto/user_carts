@@ -1,6 +1,6 @@
-user_id,latest_date,most_frequent_category
-1,2020-03-02T00:00:00.000Z,men's clothing
-2,2020-03-01T00:00:00.000Z,men's clothing
-3,2020-03-01T00:00:00.000Z,jewelery
-4,2020-03-01T00:00:00.000Z,electronics
-8,2020-03-01T00:00:00.000Z,women's clothing
+user_id,most_frequent_category,latest_date
+1,men's clothing,2020-03-02T00:00:00.000Z
+2,men's clothing,2020-03-01T00:00:00.000Z
+3,men's clothing,2020-03-01T00:00:00.000Z
+4,electronics,2020-03-01T00:00:00.000Z
+8,women's clothing,2020-03-01T00:00:00.000Z
