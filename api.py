@@ -50,11 +50,12 @@ def upload_df_to_gcs(df, bucket_name='enjoei-bucket', folder_name='user_carts'):
 
 def get_categories():
 
-    # Vamos buscar todos os produtos para ter o mapeamento
+    # Vamos buscar todos os produtos para ter o mapeamento e poder cruzar com os dados dos carrinhos dos usuários
     products_response = requests.get('https://fakestoreapi.com/products')
     if products_response.status_code == 200:
         products = products_response.json()
-        # Criando DataFrame com produto e categoria
+
+        # Criando DataFrame com produto e sua respectiva categoria
         categories_df = pd.DataFrame([
             {
                 'product_id': product['id'],
@@ -65,7 +66,7 @@ def get_categories():
         return categories_df
 
 def get_user_carts():
-    # Fazendo a chamada à API
+    # Fazendo a chamada à API de carrinhos dos usuários
     url = f'https://fakestoreapi.com/carts/'
     response = requests.get(url)
     
@@ -73,8 +74,8 @@ def get_user_carts():
         # Convertendo a resposta JSON para um dataframe
         data = response.json()
         df = pd.DataFrame(data)
-        
-        # Criando uma linha para cada produto
+
+        # Criando uma linha para cada produto pois os dados estão em formato de lista, contendo vários produtos por carrinho
         df_exploded = pd.DataFrame([
             {
                 'cart_id': row['id'],
@@ -90,7 +91,7 @@ def get_user_carts():
         # Obtendo as categorias
         categories_df = get_categories()
         
-        # Fazendo o merge com as categorias
+        # Fazendo o merge com as categorias (LEFT JOIN)
         if categories_df is not None:
             df_final = df_exploded.merge(
                 categories_df,
@@ -106,7 +107,7 @@ def get_user_carts():
                 .reset_index()
             )
             
-            # Encontrar a categoria mais frequente baseada na quantidade total
+            # Encontrar a categoria mais frequente baseada na quantidade total 
             most_frequent_categories = (
                 category_counts
                 .sort_values('quantity', ascending=False)
@@ -123,7 +124,7 @@ def get_user_carts():
                 .reset_index()
             )
             
-            # Juntando as informações
+            # Juntando as informações (INNER JOIN)
             user_summary = (
                 most_frequent_categories
                 .merge(latest_dates, on='user_id')
@@ -145,4 +146,4 @@ if __name__ == "__main__":
     print(df)
     if df is not None:
         df.to_csv('users_data.csv', index=False)
-        upload_df_to_gcs(df)
+        # upload_df_to_gcs(df)
