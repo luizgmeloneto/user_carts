@@ -146,4 +146,4 @@ if __name__ == "__main__":
     print(df)
     if df is not None:
         df.to_csv('users_data.csv', index=False)
-        # upload_df_to_gcs(df)
+        upload_df_to_gcs(df)
